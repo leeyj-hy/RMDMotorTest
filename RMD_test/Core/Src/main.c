@@ -88,6 +88,12 @@ union{
 	uint8_t byteVal[4];
 	uint32_t int32Val;
 }val4byte;
+
+struct{
+	uint32_t motorId;
+	int32_t goalPosition;
+	int16_t maxSpeed = 100;
+}RMD_Motor;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -220,6 +226,14 @@ int main(void)
      Error_Handler();
    }
   opMod = 1; //start loop
+
+  for(int i = 0; i<50; i++)
+    {
+  	  if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK)
+		  {
+			 Error_Handler();
+		  }
+    }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -633,18 +647,20 @@ int SendCANDataWCommand(uint8_t CANcommand){
 
 	for(int i = 1; i<8; i++)
 		data[i] = 0;
-
-	if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, data, &TxMailbox) == HAL_OK)
-		{
-			errRet = 0;
-		}
+	for(int i = 1; i<10; i++){
+		TxHeader.StdId = 0x140 & i;
+		if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, data, &TxMailbox) == HAL_OK)
+			{
+				errRet = 0;
+			}
+	}
 	return errRet;
 }
 
-int SendCANDataPos(int32_t m_pos, int16_t m_Mspd){
+int SendCANDataPos(uint16_t CANID, int32_t m_pos, int16_t m_Mspd){
 	uint8_t errRet = 1;
 	uint8_t data[8];
-
+	TxHeader.StdId = 0x140 & CANID;
 	data[0] = 0xa4;
 	data[1] = 0;
 	data[2] = m_Mspd;

@@ -177,7 +177,7 @@ int main(void)
   //configure transmission process
 
   TxHeader.StdId = 0x100;                 // Standard Identifier, 0 ~ 0x7FF
-  TxHeader.ExtId = 0x01;                  // Extended Identifier, 0 ~ 0x1FFFFFFF
+  TxHeader.ExtId = 0x00;                  // Extended Identifier, 0 ~ 0x1FFFFFFF
   TxHeader.RTR = CAN_RTR_DATA;            // ?��?��?��?�� 메세�????????�� ?��?��?�� ???��, DATA or REMOTE
   TxHeader.IDE = CAN_ID_STD;              // ?��?��?��?�� 메세�????????�� ?��별자 ???��, STD or EXT
   TxHeader.DLC = 8;                       // ?��?�� ?��?��?�� 길이, 0 ~ 8 byte
@@ -230,7 +230,7 @@ int main(void)
      Error_Handler();
    }
   opMod = 1; //start loop
-
+/*
   for(int i = 0; i<50; i++)
     {
   	  if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK)
@@ -238,6 +238,7 @@ int main(void)
 			 Error_Handler();
 		  }
     }
+  */
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -608,13 +609,21 @@ int SendCANDataWCommand(uint8_t CANcommand){
 
 	for(int i = 1; i<8; i++)
 		data[i] = 0;
+	/*
 	for(int i = 1; i<10; i++){
-		TxHeader.StdId = 0x140 & i;
+		TxHeader.StdId = 0x140 | i;
 		if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, data, &TxMailbox) == HAL_OK)
 			{
 				errRet = 0;
 			}
 	}
+	*/
+
+	TxHeader.StdId = 0x147;
+	if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, data, &TxMailbox) == HAL_OK)
+		{
+			errRet = 0;
+		}
 	return errRet;
 }
 

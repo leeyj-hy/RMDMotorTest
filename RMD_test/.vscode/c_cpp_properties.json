@@ -1,0 +1,22 @@
+{
+    "version": 4,
+    "configurations": [
+        {
+            "name": "STM32",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "intelliSenseMode": "${default}",
+            "includePath": [
+                "C:\\Users\\dldyd\\git\\repository\\RMD_test\\**",
+                "C:\\Users\\dldyd\\git\\repository\\RMD_test\\Core\\Inc\\**",
+                "C:\\Users\\dldyd\\git\\repository\\RMD_test\\Drivers\\CMSIS\\Device\\ST\\STM32F3xx\\Include\\**",
+                "C:\\Users\\dldyd\\git\\repository\\RMD_test\\Drivers\\CMSIS\\Include\\**",
+                "C:\\Users\\dldyd\\git\\repository\\RMD_test\\Drivers\\**",
+                "C:\\Users\\dldyd\\git\\repository\\RMD_test\\Drivers\\STM32F3xx_HAL_Driver\\Inc\\**",
+                "C:\\Users\\dldyd\\git\\repository\\RMD_test\\Drivers\\STM32F3xx_HAL_Driver\\Inc\\Legacy\\**",
+                "C:\\mingw64\\lib\\gcc\\x86_64-w64-mingw32\\8.1.0\\include\\**"
+            ],
+            "compilerPath": "C:/mingw64/bin/gcc.exe",
+            "compileCommands": "Debug/compile_commands.json"
+        }
+    ]
+}

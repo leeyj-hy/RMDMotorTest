@@ -89,10 +89,11 @@ union{
 	uint32_t int32Val;
 }val4byte;
 
-struct{
+typedef struct{
 	uint32_t motorId;
 	int32_t goalPosition;
-	int16_t maxSpeed = 100;
+	int16_t maxSpeed;
+  uint32_t lastPosReturnTime;
 }RMD_Motor;
 /* USER CODE END PV */
 
@@ -108,8 +109,11 @@ static void MX_RTC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+RMD_Motor M1, M2, M3, M4, M5, M6, M7, M8, M9;
+
 int SendCANDataWCommand(uint8_t CANcommand);
-int SendCANDataPos(int32_t m_pos, int16_t m_Mspd);
+int SendCANDataPos(uint16_t CANID,int32_t m_pos, int16_t m_Mspd);
 int SendUARTDataCommand(uint8_t command);
 int _write(int file, char *ptr, int len)
 {
@@ -172,7 +176,7 @@ int main(void)
 
   //configure transmission process
 
-  TxHeader.StdId = 0x147;                 // Standard Identifier, 0 ~ 0x7FF
+  TxHeader.StdId = 0x100;                 // Standard Identifier, 0 ~ 0x7FF
   TxHeader.ExtId = 0x01;                  // Extended Identifier, 0 ~ 0x1FFFFFFF
   TxHeader.RTR = CAN_RTR_DATA;            // ?��?��?��?�� 메세�????????�� ?��?��?�� ???��, DATA or REMOTE
   TxHeader.IDE = CAN_ID_STD;              // ?��?��?��?�� 메세�????????�� ?��별자 ???��, STD or EXT
@@ -310,63 +314,34 @@ int main(void)
 		  break;
 	  case 2:	//motor torque on mod
 		  SendCANDataWCommand(0x80);
-		  /*
-		  TxData[0] = 0x80;
-		  TxData[1] = 0;
-		  TxData[2] = 0;
-		  TxData[3] = 0;
-		  TxData[4] = 0;
-		  TxData[5] = 0;
-		  TxData[6] = 0;
-		  TxData[7] = 0;
-
-		  if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK)
-			  {
-				 Error_Handler();
-			  }
-
-		  TxDataTest[0] = 0xff;
-		  TxDataTest[1] = 0xfe;
-		  TxDataTest[2] = 0x35;
-		  TxDataTest[3] = 0;
-		  TxDataTest[4] = 0;
-		  TxDataTest[5] = 0;
-		  TxDataTest[6] = 0;
-		  TxDataTest[7] = 0;
-		  HAL_UART_Transmit(&huart2,TxDataTest, sizeof(TxDataTest), HAL_MAX_DELAY);
-		  */
+		  
 		  SendUARTDataCommand(0x35);
 		  opMod = 5;
 		  break;
 	  case 3:	//motor torque off mod
-		  TxData[0] = 0xa1;
-		  TxData[1] = 0;
-		  TxData[2] = 0;
-		  TxData[3] = 0;
-		  TxData[4] = 0;
-		  TxData[5] = 0;
-		  TxData[6] = 0;
-		  TxData[7] = 0;
+		  // TxData[0] = 0xa1;
+		  // TxData[1] = 0;
+		  // TxData[2] = 0;
+		  // TxData[3] = 0;
+		  // TxData[4] = 0;
+		  // TxData[5] = 0;
+		  // TxData[6] = 0;
+		  // TxData[7] = 0;
 
-		  if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK)
-			  {
-				 Error_Handler();
-			  }
-		  /*
-		  TxDataTest[0] = 0xff;
-		  TxDataTest[1] = 0xfe;
-		  TxDataTest[2] = 0x95;
-		  TxDataTest[3] = 0;
-		  TxDataTest[4] = 0;
-		  TxDataTest[5] = 0;
-		  TxDataTest[6] = 0;
-		  TxDataTest[7] = 0;
-		  HAL_UART_Transmit(&huart2,TxDataTest, sizeof(TxDataTest), HAL_MAX_DELAY);
-		  */
+		  // if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox) != HAL_OK)
+			//   {
+			// 	 Error_Handler();
+			//   }
+		  if(SendCANDataWCommand(0xa1))
+      {
+        Error_Handler();
+      }
 		  SendUARTDataCommand(C_MOTOR_UNLOCK);
 		  opMod = 4;
 		  break;
 	  case 4:	//motor position reading mod
+
+      
 		  TxData[0] = 0x92;
 		  TxData[1] = 0;
 		  TxData[2] = 0;
@@ -409,7 +384,7 @@ int main(void)
 		  }
 
 			  if(HAL_GetTick() - last_tx2_time > 100){
-				  if (SendCANDataPos(goalPosition, MaxSpeed) != HAL_OK)
+				  if (SendCANDataPos(7, goalPosition, MaxSpeed) != HAL_OK)
 					  {
 						 Error_Handler();
 					  }
@@ -426,20 +401,6 @@ int main(void)
 		  opMod = 1;
 		  break;
 	  }
-/*
-	  if(rxISRFlag){
-		  rxISRFlag = 0;
-		  memcpy(&rx_data, &rx_buffer, 8);
-		  CDC_Transmit_FS(rx_data, 8);
-	  }
-
-	  if(HAL_GPIO_ReadPin(user_button_GPIO_Port, user_button_Pin)){
-		  HAL_GPIO_WritePin(led_GPIO_Port, led_Pin, GPIO_PIN_SET);
-	  }
-	  else{
-		  HAL_GPIO_WritePin(led_GPIO_Port, led_Pin, GPIO_PIN_RESET);
-	  }
-	  */
 
   }
   /* USER CODE END 3 */
